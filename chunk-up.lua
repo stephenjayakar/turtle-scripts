@@ -70,6 +70,21 @@ local function moveForward()
    z = z + zDir()
 end
 
+local function moveUp()
+   if turtle.inspectUp() then
+      turtle.digUp()
+   end
+   turtle.up()
+   y = y + 1
+end
+local function moveDown()
+   if turtle.inspectDown() then
+      turtle.digDown()
+   end
+   turtle.down()
+   y = y - 1
+end
+
 local function moveTo(newX, newZ)
    local xDel = newX - x
    local zDel = newZ - z
@@ -116,12 +131,26 @@ local function main()
   end
 
   -- Basic layer program
-  for N=1,dim do
-     moveTo(N - 1,dim)
-     moveTo(N - 1, 0)
-     moveTo(N, 0)
+  while y < yLimit do
+     for N=1,dim do
+        -- Figure out which side we're on. If we're on the origin side, go forward; otherwise, come back
+        if z == 0 then
+           moveTo(N - 1, dim)
+           moveTo(N, dim)
+        else
+           moveTo(N - 1, 0)
+           moveTo(N, 0)
+        end
+        moveTo(N - 1,dim)
+        moveTo(N - 1, 0)
+
+     end
+     moveTo(0, 0)
+     moveUp()
   end
-  moveTo(0, 0)
+  while y > 0 do
+     moveDown()
+  end
 end
 
 main()
