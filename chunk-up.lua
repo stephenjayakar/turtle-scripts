@@ -90,6 +90,22 @@ local function goto(newX, newZ)
    for n=1,math.abs(zDel) do
       moveForward()
    end
+
+   -- Now x movement
+   if xDel > 0 then
+      while xDir() ~= 1 do
+         turnRight()
+      end
+   end
+   if xDel < 0 then
+      while xDir() ~= -1 do
+         turnRight()
+      end
+   end
+   -- Now it's facing the right way
+   for n=1,math.abs(xDel) do
+      moveForward()
+   end
 end
 
 local function main()
@@ -99,8 +115,12 @@ local function main()
     return
   end
 
-  -- This function just goes forward and back 4 blocks
   goto(0, 4)
+  goto(1, 4)
+
+  goto(1, 0)
+  goto(2, 0)
+  goto(2, 4)
   goto(0, 0)
 end
 
