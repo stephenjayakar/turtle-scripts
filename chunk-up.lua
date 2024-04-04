@@ -1,5 +1,5 @@
 -- Turtle mocks
-local turtle = {
+--[[ local turtle = {
     inspect = function()
         -- Return a mock result, true if there is a "chest" (assuming a specific block ID)
         return true
@@ -21,7 +21,7 @@ local turtle = {
         return 1000
     end
     -- Add more turtle methods as needed for your script
-}
+} ]]
 -- end turtle mocks
 
 
@@ -125,10 +125,10 @@ end
 
 local function main()
   -- Make sure there's a chest behind
-  if not checkChest() then
+--[[   if not checkChest() then
     print("Please place a chest behind the turtle to begin.")
     return
-  end
+  end ]]
 
   -- Basic layer program
   while y < yLimit do
@@ -141,8 +141,6 @@ local function main()
            moveTo(N - 1, 0)
            moveTo(N, 0)
         end
-        moveTo(N - 1,dim)
-        moveTo(N - 1, 0)
 
      end
      moveTo(0, 0)
