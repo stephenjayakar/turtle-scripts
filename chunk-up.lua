@@ -28,7 +28,7 @@ local turtle = {
 -- constants
 ------------
 local yLimit = 20 -- Define the y limit for the script
-local dim = 3
+local dim = 4
 -- assumes turning right
 local xTable = {0, 1, 0, -1}
 local zTable = {1, 0, -1, 0}
@@ -70,7 +70,7 @@ local function moveForward()
    z = z + zDir()
 end
 
-local function goto(newX, newZ)
+local function moveTo(newX, newZ)
    local xDel = newX - x
    local zDel = newZ - z
    print("deltas", xDel, zDel)
@@ -115,13 +115,13 @@ local function main()
     return
   end
 
-  goto(0, 4)
-  goto(1, 4)
-
-  goto(1, 0)
-  goto(2, 0)
-  goto(2, 4)
-  goto(0, 0)
+  -- Basic layer program
+  for N=1,dim do
+     moveTo(N - 1,dim)
+     moveTo(N - 1, 0)
+     moveTo(N, 0)
+  end
+  moveTo(0, 0)
 end
 
 main()
