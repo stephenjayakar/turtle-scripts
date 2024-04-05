@@ -24,9 +24,9 @@
 } ]] -- end turtle mocks
 -- constants
 ------------
-local yLimit = 20 -- Define the y limit for the script
-local dim = 4
--- assumes turning right
+local yLimit = 30 -- Define the y limit for the script
+local dim = 16
+-- assumes turning right, the table of all the direction vectors together
 local xTable = {0, 1, 0, -1}
 local zTable = {1, 0, -1, 0}
 
@@ -34,6 +34,10 @@ local startFuelLevel = turtle.getFuelLevel()
 local x, y, z = 0, 0, 0
 -- Array indexes start at 1 dear Lord
 local xDirIndex, zDirIndex = 1, 1
+local state = "mining"
+
+-- Defined later
+local dropOffAndReturn
 
 local function xDir()
     return xTable[xDirIndex]
@@ -64,7 +68,23 @@ local function turnLeft()
     zDirIndex = (zDirIndex - 2) % 4 + 1
 end
 
+local function isFull()
+    for i=1,16 do
+        if turtle.getItemCount(i) == 0 then 
+            return false
+        end
+    end
+    return true
+end
+
 local function moveForward()
+    -- Check if we should return
+    if state == "mining" and isFull() then
+        state = "returning"
+        dropOffAndReturn()
+    end
+
+    -- Otherwise move forward
     if turtle.inspect() then
         turtle.dig()
     end
@@ -116,6 +136,7 @@ local function moveTo(newX, newZ)
     end
     -- Now it's facing the right way
     for n = 1, math.abs(zDel) do
+        print("move z")
         moveForward()
     end
 
@@ -140,8 +161,66 @@ local function moveTo(newX, newZ)
     end
     -- Now it's facing the right way
     for n = 1, math.abs(xDel) do
+        print("move x")
         moveForward()
     end
+end
+
+local function moveY(newY)
+    while newY > y do
+        moveUp()
+    end
+    while newY < y do 
+        moveDown()
+    end
+end
+
+-- Make this dropoff, and then return to its spot
+local function returnToOrigin()
+    -- move x & z 
+    moveTo(0, 0)
+    -- y value
+    moveY(0)
+    -- get rotation right
+    -- TODO: you don't really need this as regardless you'll have to rotate to the chest.
+    --[[ while not (zDir() == 1 and xDir() == 0) do
+        turnRight()
+    end ]]
+end
+
+local function dropAllToChest()
+    -- TODO: write some type of rotation abstraction
+    while zDir() ~= -1 do 
+        turnRight()
+    end
+    -- drop everything
+    for i=1,16 do 
+        turtle.select(i)
+        turtle.drop()
+    end
+    turtle.select(1)
+end
+
+dropOffAndReturn = function()
+    -- save variables
+    local oldX, oldY, oldZ = x, y, z
+    local oldXDirIndex = xDirIndex
+
+    -- return
+    returnToOrigin()
+
+    -- dropoff
+    dropAllToChest()
+
+    -- moveback
+    moveTo(oldX, oldZ)
+    moveY(oldY)
+    -- Get rotation right
+    while oldXDirIndex ~= xDirIndex do
+        -- TODO: this is inefficient
+        turnRight()
+    end
+    state = "mining"
 end
 
 local function main()
