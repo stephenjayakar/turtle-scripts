@@ -22,6 +22,10 @@
     end
     -- Add more turtle methods as needed for your script
 } ]] -- end turtle mocks
+-- Argument handling
+args = {...}
+local dropItems = args[1] ~= nil and args[1] == "--dropItems"
+
 -- constants
 ------------
 local yLimit = 30 -- Define the y limit for the script
@@ -79,7 +83,7 @@ end
 
 local function moveForward()
     -- Check if we should return
-    if state == "mining" and isFull() then
+    if not dropItems and state == "mining" and isFull() then
         state = "returning"
         dropOffAndReturn()
     end
@@ -225,10 +229,10 @@ end
 
 local function main()
     -- Make sure there's a chest behind
-    --[[   if not checkChest() then
+  if not dropItems and not checkChest() then
     print("Please place a chest behind the turtle to begin.")
     return
-  end ]]
+  end
 
     -- Basic layer program
     while y < yLimit do
