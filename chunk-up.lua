@@ -1,35 +1,52 @@
 -- Turtle mocks
---[[ local turtle = {
-    inspect = function()
-        -- Return a mock result, true if there is a "chest" (assuming a specific block ID)
-        return true
-    end,
-    turnLeft = function()
-    end,
-    turnRight = function()
-    end,
-    forward = function()
-        -- Assume the turtle moves forward successfully
-        return true
-    end,
-    dig = function()
-        -- Assume the turtle digs successfully
-        return true
-    end,
-    getFuelLevel = function()
-        -- Return a mock fuel level
-        return 1000
-    end
-    -- Add more turtle methods as needed for your script
-} ]] -- end turtle mocks
--- Argument handling
-args = {...}
-local dropItems = args[1] ~= nil and args[1] == "--dropItems"
 
--- constants
-------------
-local yLimit = 30 -- Define the y limit for the script
-local dim = 16
+-- Mock turtle if it doesn't exist
+if turtle == nil then
+    turtle = {
+        inspect = function()
+            -- Return a mock result, true if there is a "chest" (assuming a specific block ID)
+            return true
+        end,
+        turnLeft = function()
+        end,
+        turnRight = function()
+        end,
+        forward = function()
+            -- Assume the turtle moves forward successfully
+            return true
+        end,
+        dig = function()
+            -- Assume the turtle digs successfully
+            return true
+        end,
+        getFuelLevel = function()
+            -- Return a mock fuel level
+            return 1000
+        end
+    }
+end
+
+-- Argument handling
+--[[ 
+Valid arguments
+- xDim: how far "right" to go
+  - DEFAULT: 16
+- yDim: how far "high" to go 
+  - DEFAULT: 30
+- zDim: how far "deep" to go 
+  - DEFAULT: 16
+- --dropItems:
+ ]]
+
+require "args"
+args = parseArgs({
+    xDim = 16,
+    yDim = 30,
+    zDim = 16,
+    dropItems = true,
+})
+
+-- constants ------------
 -- assumes turning right, the table of all the direction vectors together
 local xTable = {0, 1, 0, -1}
 local zTable = {1, 0, -1, 0}
@@ -83,7 +100,7 @@ end
 
 local function moveForward()
     -- Check if we should return
-    if not dropItems and state == "mining" and isFull() then
+    if not args.dropItems and state == "mining" and isFull() then
         state = "returning"
         dropOffAndReturn()
     end
@@ -229,18 +246,18 @@ end
 
 local function main()
     -- Make sure there's a chest behind
-  if not dropItems and not checkChest() then
+  if not args.dropItems and not checkChest() then
     print("Please place a chest behind the turtle to begin.")
     return
   end
 
     -- Basic layer program
-    while y < yLimit do
-        for N = 1, dim do
+    while y < args.yDim do
+        for N = 1, args.xDim do
             -- Figure out which side we're on. If we're on the origin side, go forward; otherwise, come back
             if z == 0 then
-                moveTo(N - 1, dim)
-                moveTo(N, dim)
+                moveTo(N - 1, args.zDim)
+                moveTo(N, args.zDim)
             else
                 moveTo(N - 1, 0)
                 moveTo(N, 0)
